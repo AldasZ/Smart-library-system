@@ -15,6 +15,12 @@ class Library:
 
     def add_user(self, user: User):
         self._users.append(user)
+    
+    def get_books(self):
+        return self._books
+
+    def get_users(self):
+        return self._users
 
     def show_books(self):
         for book in self._books:
