@@ -1,6 +1,7 @@
 from models.book import Book
 from models.user import User
 from models.reservation import Reservation
+from services.factory import NotificationFactory
 
 
 class Library:
@@ -9,19 +10,16 @@ class Library:
         self._users = []
         self._reservations = []
 
-    # --- BOOK MANAGEMENT ---
     def add_book(self, book: Book):
         self._books.append(book)
+
+    def add_user(self, user: User):
+        self._users.append(user)
 
     def show_books(self):
         for book in self._books:
             print(book)
 
-    # --- USER MANAGEMENT ---
-    def add_user(self, user: User):
-        self._users.append(user)
-
-    # --- BORROW ---
     def borrow_book(self, user_id: int, book_id: int):
         book = self._find_book(book_id)
         user = self._find_user(user_id)
@@ -35,7 +33,6 @@ class Library:
         else:
             print("Book is not available")
 
-    # --- RETURN ---
     def return_book(self, book_id: int):
         book = self._find_book(book_id)
 
@@ -45,11 +42,8 @@ class Library:
 
         book.return_book()
         print(f"{book.get_title()} returned")
-
-        # Patikrinam rezervacijas
         self._check_reservations(book)
 
-    # --- RESERVATION ---
     def reserve_book(self, user_id: int, book_id: int):
         book = self._find_book(book_id)
         user = self._find_user(user_id)
@@ -65,22 +59,28 @@ class Library:
             self._reservations.append(reservation)
             print(f"{user.get_name()} reserved {book.get_title()}")
 
-    # --- HELPERS ---
-    def _find_book(self, book_id):
+    def _find_book(self, book_id: int):
         for book in self._books:
             if book.get_id() == book_id:
                 return book
         return None
 
-    def _find_user(self, user_id):
+    def _find_user(self, user_id: int):
         for user in self._users:
             if user.get_id() == user_id:
                 return user
         return None
 
-    def _check_reservations(self, book):
+    def _check_reservations(self, book: Book):
         for reservation in self._reservations:
             if reservation.get_book() == book:
-                print(f"Reservation available for {reservation.get_user().get_name()}")
+                user = reservation.get_user()
+
+                notification = NotificationFactory.create_notification("email")
+                notification.send(
+                    user.get_name(),
+                    f"The book '{book.get_title()}' is now available."
+                )
+
                 self._reservations.remove(reservation)
                 break
