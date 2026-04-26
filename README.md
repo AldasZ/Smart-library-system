@@ -122,6 +122,8 @@ Ateityje sistema galėtų būti išplėsta:
 - Markdown dokumentacija
 - GitHub dokumentacija
 
+- Github link: https://github.com/AldasZ/Smart-library-system.git
+
 
 
 
